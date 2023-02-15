@@ -13,6 +13,16 @@ function imprimeLista(resultado, identificador = '') {
 
 async function processaTexto (argumentos) {
   const caminho = argumentos[2];
+
+  try {
+    fs.lstatSync(caminho);
+  } catch (erro) {
+    if (erro.code === 'ENOENT') {
+      console.log('arquivo ou diretório não existe');
+      return;
+    }
+  }
+
   //verifica se é um caminho de um diretório ou se é um caminho de arquivo específico
   if (fs.lstatSync(caminho).isFile()) {
     const resultado = await pegaArquivo(argumentos[2]);
@@ -21,10 +31,9 @@ async function processaTexto (argumentos) {
     const arquivos = await fs.promises.readdir(caminho)
     arquivos.forEach(async (nomeDeArquivo) => {
       const lista = await pegaArquivo(`${caminho}/${nomeDeArquivo}`)
-      imprimeLista(lista);
+      imprimeLista(lista, nomeDeArquivo);
       })
   }
-
 }
 
 processaTexto(caminho);
